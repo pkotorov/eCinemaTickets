@@ -42,5 +42,69 @@ namespace eCinemaTickets.Controllers
 
             return this.RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var actorDetails = await actorsService.GetByIdAsync(id);
+
+            if (actorDetails == null)
+            {
+                return this.View(nameof(NotFound));
+            }
+
+            return this.View(actorDetails);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var actorDetails = await actorsService.GetByIdAsync(id);
+
+            if (actorDetails == null)
+            {
+                return this.View(nameof(NotFound));
+            }
+
+            return this.View(actorDetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([Bind("Id,FullName,ProfilePictureUrl,Bio")] Actor actor)
+        {
+            if (!ModelState.IsValid)
+            {
+                return this.View(actor);
+            }
+
+            await this.actorsService.UpdateAsync(actor);
+
+            return this.RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var actorDetails = await actorsService.GetByIdAsync(id);
+
+            if (actorDetails == null)
+            {
+                return this.View(nameof(NotFound));
+            }
+
+            return this.View(actorDetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var actorDetails = await actorsService.GetByIdAsync(id);
+
+            if (actorDetails == null)
+            {
+                return this.View(nameof(NotFound));
+            }
+
+            await this.actorsService.DeleteAsync(id);
+
+            return this.RedirectToAction(nameof(Index));
+        }
     }
 }
