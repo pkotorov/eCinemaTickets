@@ -22,12 +22,12 @@ namespace eCinemaTickets.Controllers
         {
             var data = await this.actorsService.GetAllAsync();
 
-            return View(data);
+            return this.View(data);
         }
 
         public IActionResult Create()
         {
-            return View();
+            return this.View();
         }
 
         [HttpPost]
