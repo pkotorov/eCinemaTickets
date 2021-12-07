@@ -23,6 +23,12 @@ namespace eCinemaTickets.Data
 
         public DbSet<Producer> Producers { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderItem> OrderItems { get; set; }
+
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ActorMovie>().HasKey(am => new
