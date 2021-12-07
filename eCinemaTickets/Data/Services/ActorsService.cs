@@ -10,8 +10,6 @@ namespace eCinemaTickets.Data.Services
 {
     public class ActorsService : EntityBaseRepository<Actor>, IActorsService
     {
-        private readonly AppDbContext context;
-
         public ActorsService(AppDbContext context) 
             : base (context)
         {

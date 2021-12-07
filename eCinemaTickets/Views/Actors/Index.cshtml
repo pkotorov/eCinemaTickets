@@ -17,7 +17,7 @@
                 {
                     <tr>
                         <td class="align-middle">
-                            <img class="rounded-circle" src="@actor.ProfilePictureUrl" style="max-width: 150px"/>
+                            <img class="rounded-circle" src="@actor.ProfilePictureUrl" style="max-width: 150px" />
                         </td>
                         <td class="align-middle">
                             @actor.FullName
@@ -38,6 +38,4 @@
     </div>
 </div>
 
-<div class="text-white" style="position: fixed; right: 25px; bottom: 25px;">
-    <a asp-controller="Actors" asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i>Add New</a>
-</div>
+@await Html.PartialAsync("_CreateItem", "Actors"); 
