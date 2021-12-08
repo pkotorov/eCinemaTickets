@@ -1,14 +1,18 @@
 ﻿using eCinemaTickets.Data.Cart;
 using eCinemaTickets.Data.Services;
+using eCinemaTickets.Data.Static;
 using eCinemaTickets.Data.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace eCinemaTickets.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly IMoviesService moviesService;
@@ -23,8 +27,9 @@ namespace eCinemaTickets.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var userId = "";
-            var orders = await this.ordersService.GetOrdersByUserIdAsync(userId);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = this.User.FindFirstValue(ClaimTypes.Role);
+            var orders = await this.ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
 
             return this.View(orders);
         }
@@ -70,8 +75,8 @@ namespace eCinemaTickets.Controllers
         public async Task<IActionResult> CompleteOrder()
         {
             var items = this.shoppingCart.GetShoppingCartItems();
-            var userId = "";
-            var userEmailAddress = "";
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmailAddress = this.User.FindFirstValue(ClaimTypes.Email);
 
             await this.ordersService.StoreOrderAsync(items, userId, userEmailAddress);
             await this.shoppingCart.ClearShoppingCartAsync();

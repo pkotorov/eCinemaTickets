@@ -1,10 +1,13 @@
 using eCinemaTickets.Data;
 using eCinemaTickets.Data.Cart;
 using eCinemaTickets.Data.Services;
+using eCinemaTickets.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +43,16 @@ namespace eCinemaTickets
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(sc => ShoppingCart.GetShoppingCart(sc));
 
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+
+            services.AddMemoryCache();
+
             services.AddSession();
+
+            services.AddAuthentication(options => 
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
 
             services.AddControllersWithViews();
         }
@@ -64,6 +76,8 @@ namespace eCinemaTickets
             app.UseRouting();
             app.UseSession();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -74,6 +88,7 @@ namespace eCinemaTickets
             });
 
             AppDbInitializer.Seed(app);
+            AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
         }
     }
 }

@@ -15,8 +15,11 @@
                             <p class="card-text">
                                 <h5 class="card-title">
                                     @movie.Name
-                                <a asp-action="Edit" asp-route-id="@movie.Id" class="text-white float-right"><i class="bi bi-pencil-square"></i></a>
-                            </h5>
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@movie.Id" class="text-white float-right"><i class="bi bi-pencil-square"></i></a>
+                                    }
+                                </h5>
                         </p>
                     </div>
                 </div>
