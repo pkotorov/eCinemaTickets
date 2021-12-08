@@ -1,5 +1,7 @@
 ﻿using eCinemaTickets.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +24,8 @@ namespace eCinemaTickets.Data.Cart
 
         public List<ShoppingCartItem> GetShoppingCartItems()
         {
-            return ShoppingCartItems ?? (ShoppingCartItems = this.context.ShoppingCartItems
-                .Where(x => x.ShoppingCartId == ShoppingCartId)
+            return this.ShoppingCartItems ?? (this.ShoppingCartItems = this.context.ShoppingCartItems
+                .Where(x => x.ShoppingCartId == this.ShoppingCartId)
                 .Include(n => n.Movie)
                 .ToList());
         }
@@ -31,7 +33,7 @@ namespace eCinemaTickets.Data.Cart
         public decimal GetShoppingCartTotal()
         {
             var total = this.context.ShoppingCartItems
-                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Where(n => n.ShoppingCartId == this.ShoppingCartId)
                 .Select(n => n.Movie.Price * n.Amount)
                 .Sum();
 
@@ -41,7 +43,7 @@ namespace eCinemaTickets.Data.Cart
         public void AddItemToCart(Movie movie)
         {
             var shoppingCartItem = this.context.ShoppingCartItems
-                .FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == ShoppingCartId);
+                .FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == this.ShoppingCartId);
 
             if(shoppingCartItem == null)
             {
@@ -65,7 +67,7 @@ namespace eCinemaTickets.Data.Cart
         public void RemoveItemFromCart(Movie movie)
         {
             var shoppingCartItem = this.context.ShoppingCartItems
-                 .FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == ShoppingCartId);
+                 .FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == this.ShoppingCartId);
 
             if (shoppingCartItem != null)
             {
@@ -80,6 +82,32 @@ namespace eCinemaTickets.Data.Cart
 
                 this.context.SaveChanges();
             }
+        }
+
+        public static ShoppingCart GetShoppingCart(IServiceProvider services)
+        {
+            ISession session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext.Session;
+            var context = services.GetService<AppDbContext>();
+
+            string cartId = session.GetString("CartId") ?? Guid.NewGuid().ToString();
+
+            session.SetString("CartId", cartId);
+
+            return new ShoppingCart(context)
+            {
+                ShoppingCartId = cartId
+            };
+        }
+
+        public async Task ClearShoppingCartAsync()
+        {
+            var items = await this.context.ShoppingCartItems
+                .Where(x => x.ShoppingCartId == this.ShoppingCartId)
+                .Include(n => n.Movie)
+                .ToListAsync();
+
+            this.context.ShoppingCartItems.RemoveRange(items);
+            await this.context.SaveChangesAsync();
         }
     }
 }
