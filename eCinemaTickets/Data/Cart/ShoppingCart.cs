@@ -108,6 +108,8 @@ namespace eCinemaTickets.Data.Cart
 
             this.context.ShoppingCartItems.RemoveRange(items);
             await this.context.SaveChangesAsync();
+
+            this.ShoppingCartItems = new List<ShoppingCartItem>();
         }
     }
 }

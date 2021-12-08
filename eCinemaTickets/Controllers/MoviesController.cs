@@ -37,7 +37,7 @@ namespace eCinemaTickets.Controllers
 
             if(!string.IsNullOrEmpty(searchString))
             {
-                var filteredResult = movies.Where(x => x.Name.Contains(searchString) || x.Description.Contains(searchString)).ToList();
+                var filteredResult = movies.Where(x => x.Name.ToLower().Contains(searchString.ToLower()) || x.Description.ToLower().Contains(searchString.ToLower())).ToList();
 
                 return this.View(nameof(Index), filteredResult);
             }
